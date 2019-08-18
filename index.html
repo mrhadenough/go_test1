@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Banking simulator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+
+<body>
+    <br>
+    <div class="row">
+        <div class="card col-sm-4">
+            <div class="card-body">
+                <h5 class="card-title">Create account</h5>
+                <p class="card-text">
+                    <form action="/accounts/" method="post" class="create-account-form">
+                        <div class="form-group">
+                            <label>Enter balance</label>
+                            <input type="text" name="balance" class="form-control">
+                        </div>
+                        <p>
+                            <pre class="result-acc-created"></pre>
+                        </p>
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </form>
+                </p>
+            </div>
+        </div>
+        <br>
+        <div class="card col-sm-4">
+            <div class="card-body">
+                <h5 class="card-title">Check account balance</h5>
+                <p class="card-text">
+                    <form class="check-balance-form">
+                        <div class="form-group">
+                            <label>Enter account ID</label>
+                            <input type="text" name="id" class="form-control">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Check</button>
+                        <p>
+                            <pre class="result"></pre>
+                        </p>
+                    </form>
+                </p>
+            </div>
+        </div>
+        <br>
+        <div class="card col-sm-4">
+            <div class="card-body">
+                <h5 class="card-title">Send money between accounts</h5>
+                <p class="card-text">
+                    <form class="send-money-form">
+                        <div class="form-group">
+                            <label>From account ID</label>
+                            <input type="text" name="id_from" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>To account ID</label>
+                            <input type="text" name="id_to" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Amount</label>
+                            <input type="text" name="amount" class="form-control">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Send</button>
+                    </form>
+                </p>
+            </div>
+        </div>
+        <div class="col-md-6">
+
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function () {
+            $('.create-account-form').submit(function (e) {
+                e.preventDefault()
+                var balance = $('.create-account-form input[name="balance"]').val()
+                $.ajax({
+                    url: '/accounts/',
+                    method: 'post',
+                    data: {
+                        balance: balance,
+                    },
+                    success: function (response) {
+                        $('.result-acc-created').text(JSON.stringify(response, null, 2));
+                    },
+                    error: function (response) {
+                        alert(response.responseJSON.error);
+                    }
+                })
+            });
+            $('.check-balance-form').submit(function (e) {
+                e.preventDefault()
+                var id = $('.check-balance-form input[name="id"]').val()
+                $.ajax({
+                    url: '/accounts/' + id + '/',
+                    method: 'get',
+                    success: function (response) {
+                        $('.result').text(JSON.stringify(response, null, 2));
+                    },
+                    error: function (response) {
+                        if (response.status === 404) {
+                            $('.result').text("User not found");
+                        }
+                        $('.result').text(JSON.stringify(response.responseJSON, null, 2));
+                    }
+                })
+            });
+            $('.send-money-form').submit(function (e) {
+                e.preventDefault()
+                var idFrom = $('.send-money-form input[name="id_from"]').val()
+                var idTo = $('.send-money-form input[name="id_to"]').val()
+                var balance = $('.send-money-form input[name="amount"]').val()
+                $.ajax({
+                    url: '/send_money/',
+                    method: 'post',
+                    data: {
+                        id_from: idFrom,
+                        id_to: idTo,
+                        amount: balance,
+                    },
+                    success: function (response) {
+                        alert('sent')
+                        // $('.result').text(JSON.stringify(response, null, 2));
+                    },
+                    error: function (response) {
+                        alert(response.responseJSON.error);
+                    }
+                })
+            });
+        });
+    </script>
+</body>
+
+</html>
